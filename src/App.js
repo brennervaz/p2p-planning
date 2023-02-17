@@ -6,15 +6,35 @@ import logo from './logo.svg';
 function App() {
   const [targetRoomId, setTargetRoomId] = useState('')
   const [room, setRoom] = useState('')
+  const [dataChannel, setDataChannel] = useState(null)
+  const [message, setMessage] = useState('')
 
-  const createRoom = (roomId = Math.floor(Math.random() * (1000 - 10 + 1)) + 10) => {
-    startHost(roomId)
-    setRoom(roomId)
+  const setupDataChannel = dataChannel => {
+    dataChannel.addEventListener('message', handleMessage)
+    setDataChannel(dataChannel)
   }
 
-  const connectToRoom = (roomId) => {
-    startPeer(roomId)
+  const handleMessage = message => {
+    if (message.data !== 'ping') {
+      console.log('message', message.data)
+    }
+  }
+
+  const createRoom = async (roomId = Math.floor(Math.random() * (1000 - 10 + 1)) + 10) => {
     setRoom(roomId)
+    const dataChannel = await startHost(roomId)
+    setupDataChannel(dataChannel)
+  }
+
+  const connectToRoom = async (roomId) => {
+    setRoom(roomId)
+    const dataChannel = await startPeer(roomId)
+    setupDataChannel(dataChannel)
+  }
+
+  const sendMessage = message => {
+    dataChannel.send(message)
+    setMessage('')
   }
 
   return (
@@ -24,7 +44,13 @@ function App() {
         {room ? (
           <>
             <span>connected to room {room}</span>
+            <br />
             <button onClick={() => setRoom('')}>exit</button>
+            <br />
+            <br />
+            <br />
+            <input type="text" placeholder="message" onChange={e => setMessage(e.currentTarget.value)} />
+            <button onClick={() => sendMessage(message)}>send</button>
           </>
         ) : (
           <>
