@@ -1,0 +1,1 @@
+export const getLogPrefix = (userLabel, userID) => `[${userLabel} ${userID}]`
