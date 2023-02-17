@@ -37,7 +37,7 @@ function App() {
             </button>
             <button
               className="App-link"
-              onClick={e => createRoom()}
+              onClick={e => createRoom(targetRoomId)}
             >
               Create room
             </button>
